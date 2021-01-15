@@ -1,0 +1,63 @@
+﻿<div class="container" style="margin-top: 40px;">
+    <div class="row bg-danger p-3 text-center">
+        <div class="col-4">
+            <strong class="h3 float-left">@_gameModel.Player's turn</strong>
+        </div>
+        <div class="col-4">
+            <strong class="h3">@_gameStatus</strong>
+        </div>
+        <div class="col-4">
+            <button type="button" class="btn btn-primary float-right"
+                    @onclick="HandleOnRestartClick"><i class="oi oi-reload"></i></button>
+        </div>
+    </div>
+    <div class="row">
+        @for (int i = 0; i < 9; i++)
+        {
+            var number = i;
+            var bootstrapBoard = "text-white";
+            <div class="card bg-primary col-4" >
+                <div class="card-body bg-success border m-2" style="height:200px" 
+                     @onclick="() => HandleOnBoardTitleClick(number)">
+                    @if (_gameModel.FindWinner() != null && _gameModel.FindWinner().Contains(i))
+                    {
+                        bootstrapBoard = "text-primary";
+                    }
+                    <p class="align-items-center d-flex h-100 justify-content-center display-1 @bootstrapBoard">@_gameModel.Board[i]</p>
+                </div>
+            </div>
+        }
+    </div>
+
+    </div>
+@code {
+    GameModel _gameModel;
+
+    string _gameStatus;
+
+    protected override void OnInitialized()
+    {
+        _gameModel = new GameModel();
+        _gameStatus = "In Progress";
+    }
+
+    public void HandleOnRestartClick()
+    {
+        _gameModel = new GameModel();
+        _gameStatus = "In Progress";
+    }
+
+    public void HandleOnBoardTitleClick(int index)
+    {
+        _gameModel.MakeMove(index);
+        if (!_gameModel.IsRunning() && _gameModel.FindWinner() == null)
+        {
+            _gameStatus = "It's a tie";
+        }
+        if (_gameModel.FindWinner() != null)
+        {
+            _gameStatus = $"{_gameModel.Player} is the Winner";
+            StateHasChanged();
+        }
+    }
+}
